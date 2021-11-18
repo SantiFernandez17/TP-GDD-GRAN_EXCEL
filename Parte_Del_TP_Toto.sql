@@ -17,7 +17,7 @@ CREATE TABLE GRAN_EXCEL.[BI_hecho_arreglo](
 )
 
 insert into GRAN_EXCEL.BI_hecho_arreglo
-select distinct [id_taller], md2.[id_modelo], [id_tarea], c2.[id_camion], m1.[nro_legajo], [id_marca], tiem_id, [id_material], otxt_tiempo_real, [tiempo_estimado], [cantidad]
+select distinct [id_taller], md2.[id_modelo], [id_tarea], c2.[id_camion], m1.[nro_legajo], [id_marca], tiempo_id, [id_material], otxt_tiempo_real, [tiempo_estimado], [cantidad]
 from GRAN_EXCEL.[TareasXOrdenes]
 join GRAN_EXCEL.BI_DIM_TIPO_TAREA on-- tare_id = otxt_tarea
 join GRAN_EXCEL.Tarea t1 on t1.tare_id = otxt_tarea
@@ -88,7 +88,7 @@ as
 	
 	select distinct  id_cami Camion , tiem_cuatri Cuatrimestre, max(tiempo_arreglo) tiempoMaximo 
 	from GRAN_EXCEL.BI_hecho_arreglo
-	join GRAN_EXCEL.BI_DIM_TIEMPO on id_tiem = tiem_id
+	join GRAN_EXCEL.BI_DIM_TIEMPO on id_tiem = tiempo_id
 	group by tiem_cuatri,id_cami
 	
 go
@@ -102,7 +102,7 @@ as
 	
 	select id_Cami, id_tall, tiem_cuatri, sum(mate_cant * mate_precio) + sum( meca_costoHora * 8 * tiempo_arreglo)/ count(distinct id_Tare)  costoTotal
 	from GRAN_EXCEL.BI_hecho_arreglo
-	join GRAN_EXCEL.BI_DIM_TIEMPO on id_tiem = tiem_id
+	join GRAN_EXCEL.BI_DIM_TIEMPO on id_tiem = tiempo_id
 	join GRAN_EXCEL.BI_DIM_MATERIAL on id_mate = mate_id
 	join GRAN_EXCEL.BI_DIM_MECANICO on meca_legajo = legajo_meca
 	group by id_cami, id_tall, tiem_cuatri
@@ -160,7 +160,7 @@ GO
 create view GRAN_EXCEL.BI_facturacion_total_x_recorrido
 as
 	select id_Reco, tiem_cuatri, sum(ingresos) facturacionTotal from GRAN_EXCEL.BI_hecho_envio
-	join GRAN_EXCEL.BI_DIM_TIEMPO on tiem_id = id_tiem
+	join GRAN_EXCEL.BI_DIM_TIEMPO on tiempo_id = id_tiem
 	group by id_reco, tiem_cuatri 
 
 go
