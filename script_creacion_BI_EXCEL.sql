@@ -225,10 +225,10 @@ INSERT INTO GRAN_EXCEL.BI_DIM_MECANICO
 
 --DIMENSION MATERIAL (agregada)
 CREATE TABLE GRAN_EXCEL.BI_DIM_MATERIAL (
-    material_id INT PRIMARY KEY,
-	material_cod NVARCHAR(100) NOT NULL,
-    material_descripcion NVARCHAR(255) NOT NULL,
-    precio DECIMAL(18, 2) NOT NULL,
+    [id_material] INT PRIMARY KEY,
+	[codigo] NVARCHAR(100) NOT NULL,
+    [descripcion] NVARCHAR(255) NOT NULL,
+    [precio] DECIMAL(18, 2) NOT NULL,
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_MATERIAL (material_id, material_cod, material_descripcion, precio)
@@ -257,6 +257,14 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_TAREA (
 INSERT INTO GRAN_EXCEL.BI_DIM_TAREA ([codigo], [descripcion])
 	SELECT [codigo], t.[descripcion]
 	FROM GRAN_EXCEL.[Tareas] t
+
+
+
+
+
+
+
+
 
 
 
