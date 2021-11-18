@@ -45,14 +45,14 @@ CREATE TABLE GRAN_EXCEL.[BI_hecho_envio](
 )
 
 insert into GRAN_EXCEL.BI_hecho_envio
-select distinct viaj_chof, viaj_recorrido, viaj_camion, tiem_id, sum(paqx_cantidad * tipa_precio+reco_precio), viaj_consumo_combustible , datediff(day,viaj_fecha_inicio, viaj_fecha_fin)  --Los paso directamente desde la tabla viaje
+select distinct [legajo_chofer_designado] , [id_recorrido], [id_camion_designado], tiem_id, sum(paqx_cantidad * tipa_precio+[precio]), [consumo_combustible] , datediff(day,[fecha_inicio], [fecha_fin])  --Los paso directamente desde la tabla viaje
 from GRAN_EXCEL.[Viajes]
 join GRAN_EXCEL.BI_DIM_TIEMPO on year(viaj_fecha_inicio) = tiem_anio and DATEPART(quarter,viaj_fecha_inicio) = tiem_cuatri
 join GRAN_EXCEL.[PaquetesXViajes] on paqx_viaje = viaj_id
 join GRAN_EXCEL.[Tipos_paquetes] on paqx_tipo = tipa_id
-join GRAN_EXCEL.[Choferes] on viaj_chof = chof_legajo
-join GRAN_EXCEL.BI_DIM_RECORRIDO on viaj_recorrido = reco_id
-group by viaj_chof, viaj_recorrido, viaj_camion, tiem_id, viaj_consumo_combustible,viaj_fecha_inicio, viaj_fecha_fin
+join GRAN_EXCEL.[Choferes] on [legajo_chofer_designado] = [nro_legajo]
+join GRAN_EXCEL.BI_DIM_RECORRIDO on [id_recorrido] = [id_recorrido]
+group by [legajo_chofer_designado], [id_recorrido], [id_camion_designado], tiem_id, [consumo_combustible],[fecha_inicio] , [fecha_fin] 
 
 
 -- CONSTRAINTS
