@@ -107,7 +107,9 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_TIEMPO(
 INSERT INTO GRAN_EXCEL.BI_DIM_TIEMPO (anio, cuatrimestre)
 	SELECT year([fecha_inicio]), DATEPART(quarter,[fecha_inicio]) from GRAN_EXCEL.[TareasXOrdenes]
 	UNION 
-	SELECT year([fecha_fin]), DATEPART(quarter,[fecha_fin]) from GRAN_EXCEL.[TareasXOrdenes]
+	SELECT year([fecha_fin]),
+	DATEPART(quarter,[fecha_fin])
+	from GRAN_EXCEL.[TareasXOrdenes]
 
 --DIMENSION CAMION
 CREATE TABLE GRAN_EXCEL.BI_DIM_CAMION (
@@ -120,7 +122,12 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_CAMION (
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_CAMION([id_camion], [patente], [nro_chasis], [nro_motor],[fecha_alta])
-	SELECT [id_camion], [patente], [nro_chasis], [nro_motor],[fecha_alta] from GRAN_EXCEL.[Camiones]
+	SELECT [id_camion],
+	[patente],
+	[nro_chasis], 
+	[nro_motor],
+	[fecha_alta] 
+	from GRAN_EXCEL.[Camiones]
 
 --DIMENSION MARCAS
 CREATE TABLE GRAN_EXCEL.BI_DIM_MARCA(
@@ -129,7 +136,8 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_MARCA(
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_MARCA([descripcion])
-	SELECT [id_marca] from GRAN_EXCEL.[Marcas]
+	SELECT [id_marca]
+	from GRAN_EXCEL.[Marcas]
 
 --DIMENSION MODELOS
 CREATE TABLE GRAN_EXCEL.BI_DIM_MODELO(
@@ -142,7 +150,13 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_MODELO(
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_MODELO([id_modelo], [camion], [velocidad_max], [capacidad_tanque], [capacidad_carga], [id_marca])
-	SELECT [id_modelo], [camion], [velocidad_max], [capacidad_tanque], [capacidad_carga], [id_marca] FROM GRAN_EXCEL.[Modelos]
+	SELECT [id_modelo],
+	[camion], 
+	[velocidad_max], 
+	[capacidad_tanque], 
+	[capacidad_carga], 
+	[id_marca] 
+	from GRAN_EXCEL.[Modelos]
 
 --DIMENSION TALLER
 CREATE TABLE GRAN_EXCEL.BI_DIM_TALLER(
@@ -155,7 +169,12 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_TALLER(
 
 
 INSERT INTO GRAN_EXCEL.BI_DIM_TALLER ([id_taller], [nombre], [telefono], [direccion], [mail]) 
-	SELECT [id_taller], [nombre], [telefono], [direccion], [mail] FROM GRAN_EXCEL.[Talleres]
+	SELECT [id_taller], 
+	[nombre], 
+	[telefono], 
+	[direccion], 
+	[mail] 
+	from GRAN_EXCEL.[Talleres]
 
 --DIMENSION TIPO_TAREA
 CREATE TABLE GRAN_EXCEL.BI_DIM_TIPO_TAREA(
@@ -165,7 +184,9 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_TIPO_TAREA(
 
 
 INSERT INTO GRAN_EXCEL.BI_DIM_TIPO_TAREA ([id_tipo_tarea], [descripcion]) 
-	SELECT [id_tipo_tarea], [descripcion] FROM GRAN_EXCEL.[Tipos_tareas]
+	SELECT [id_tipo_tarea], 
+	[descripcion] 
+	from GRAN_EXCEL.[Tipos_tareas]
 
 --DIMENSION RECORRIDO
 CREATE TABLE GRAN_EXCEL.BI_DIM_RECORRIDO (
@@ -178,9 +199,9 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_RECORRIDO (
 
 INSERT INTO GRAN_EXCEL.BI_DIM_RECORRIDO ([id_recorrido], [km], [precio], [id_ciudad_origen], [id_ciudad_destino]) 
 	SELECT [id_recorrido], [km], [precio], 
-		(SELECT [nombre] FROM GRAN_EXCEL.[Ciudades] c WHERE r.[id_ciudad_origen] = c.[id_ciudad]), 
-		(SELECT [nombre] FROM GRAN_EXCEL.[Ciudades] c WHERE r.[id_ciudad_destino] = c.[id_ciudad])
-	FROM [GRAN_EXCEL].[Recorridos] r
+	(SELECT [nombre] FROM GRAN_EXCEL.[Ciudades] c WHERE r.[id_ciudad_origen] = c.[id_ciudad]), 
+	(SELECT [nombre] FROM GRAN_EXCEL.[Ciudades] c WHERE r.[id_ciudad_destino] = c.[id_ciudad])
+	from [GRAN_EXCEL].[Recorridos] r
 
 --DIMENSION CHOFER
 CREATE TABLE GRAN_EXCEL.BI_DIM_CHOFER(
@@ -201,7 +222,7 @@ INSERT INTO GRAN_EXCEL.BI_DIM_CHOFER
 	([nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], [rango_edad_chofer]) 
 	SELECT  
 	[nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], [rango_edad_chofer], GRAN_EXCEL.getAgeRange([fecha_nacimiento]) 
-	FROM GRAN_EXCEL.[Choferes]
+	from GRAN_EXCEL.[Choferes]
 
 --DIMENSION MECANICO
 CREATE TABLE GRAN_EXCEL.BI_DIM_MECANICO(
@@ -222,7 +243,7 @@ INSERT INTO GRAN_EXCEL.BI_DIM_MECANICO
 	([nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], rango_edad) 
 	SELECT  
 	[nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], rango_edad, GRAN_EXCEL.getAgeRange(fecha_nacimiento) 
-	FROM GRAN_EXCEL.[Mecanicos]
+	from GRAN_EXCEL.[Mecanicos]
 
 --DIMENSION MATERIAL (agregada)
 CREATE TABLE GRAN_EXCEL.BI_DIM_MATERIAL (
@@ -234,7 +255,12 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_MATERIAL (
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_MATERIAL ([id_material], [codigo], [descripcion], [precio])
-	SELECT [id_material], [codigo], [descripcion], [precio], [cantidad_materiales] FROM GRAN_EXCEL.[Materiales]
+	SELECT [id_material], 
+	[codigo], 
+	[descripcion], 
+	[precio], 
+	[cantidad_materiales] 
+	from GRAN_EXCEL.[Materiales]
 
 --DIMENSION VIAJE_X_PAQUETE (Agregada)
 CREATE TABLE GRAN_EXCEL.BI_DIM_VIAJE_X_PAQUETE (
@@ -247,7 +273,11 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_VIAJE_X_PAQUETE (
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_VIAJE_X_PAQUETE ([id_viaje], [id_paquetes_x_viaje], [cantidad], [precioTotal])
-	SELECT [id_viaje], [id_paquetes_x_viaje], [cantidad], [precioTotal] FROM GRAN_EXCEL.[PaquetesXViajes]
+	SELECT [id_viaje], 
+	[id_paquetes_x_viaje], 
+	[cantidad], 
+	[precioTotal] 
+	from GRAN_EXCEL.[PaquetesXViajes]
 
 
 --DIMENSION TAREA 
@@ -257,11 +287,9 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_TAREA (
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_TAREA ([codigo], [descripcion])
-	SELECT [codigo], t.[descripcion]
-	FROM GRAN_EXCEL.[Tareas] t
-
-
-
+	SELECT [codigo], 
+	t.[descripcion]
+	from GRAN_EXCEL.[Tareas] t
 
 
 
