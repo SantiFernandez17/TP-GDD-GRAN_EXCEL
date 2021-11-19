@@ -187,12 +187,12 @@ IF OBJECT_ID ('GRAN_EXCEL.BI_ganancia_x_camion', 'V') IS NOT NULL
 GO
 create view GRAN_EXCEL.BI_ganancia_x_camion
 as
-	select e.id_cami, sum(e.ingresos) - sum((e.consumo*100)+(e.tiempoDias * 8 * chof_costo_hora)) - sum(mate_cant * mate_precio) + (sum( meca_costoHora * 8 * tiempo_arreglo)/count(distinct mate_id) )ganancia  
+	select e.id_cami, sum(e.ingresos) - sum((e.consumo*100)+(e.tiempoDias * 8 * [costo_hora])) - sum(mate_cant * [precio]) + (sum( [costo_hora] * 8 * tiempo_arreglo)/count(distinct [id_material]) ) ganancia  
 	from GRAN_EXCEL.BI_hecho_envio e
-	join GRAN_EXCEL.BI_Chofer on e.legajo_chof = chof_legajo
+	join GRAN_EXCEL.BI_DIM_CHOFER on e.legajo_chof = [nro_legajo]
 	join GRAN_EXCEL.BI_hecho_arreglo a on a.id_cami = e.id_cami
-	join GRAN_EXCEL.BI_Materiales on a.id_mate = mate_id
-	join GRAN_EXCEL.BI_Mecanico on meca_legajo = a.legajo_meca
+	join GRAN_EXCEL.BI_DIM_MATERIAL on a.id_mate = [id_material]
+	join GRAN_EXCEL.BI_DIM_MECANICO on [nro_legajo] = a.legajo_meca
 	group by e.id_cami
 
 go
