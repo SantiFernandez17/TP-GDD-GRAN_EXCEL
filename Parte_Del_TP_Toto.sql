@@ -38,16 +38,16 @@ CREATE TABLE GRAN_EXCEL.[BI_hecho_envio](
   [nro_legajo] int,
   [id_recorrido] int,
   [id_camion] int,
-  --[id_tiem] int,
+  tiempo_id int,
   [ingresos] decimal(18,2), -- nose
   [consumo] decimal(18,2), -- creo que es [consumo_combustible]
   [tiempoDias] int -- nose
 )
 
 insert into GRAN_EXCEL.BI_hecho_envio
-select distinct [legajo_chofer_designado] , [id_recorrido], [id_camion_designado], tiem_id, sum(paqx_cantidad * tipa_precio+[precio]), [consumo_combustible] , datediff(day,[fecha_inicio], [fecha_fin])  --Los paso directamente desde la tabla viaje
+select distinct [legajo_chofer_designado] , [id_recorrido], [id_camion_designado], tiempo_id, sum([cantidad] * [precio]+[precio]), [consumo_combustible] , datediff(day,[fecha_inicio], [fecha_fin])  --Los paso directamente desde la tabla viaje
 from GRAN_EXCEL.[Viajes]
-join GRAN_EXCEL.BI_DIM_TIEMPO on year([fecha_inicio]) = tiem_anio and DATEPART(quarter,[fecha_inicio]) = tiem_cuatri
+join GRAN_EXCEL.BI_DIM_TIEMPO on year([fecha_inicio]) = anio and DATEPART(quarter,[fecha_inicio]) = cuatrimestre
 join GRAN_EXCEL.[PaquetesXViajes] on [id_viaje] = [id_viaje]
 join GRAN_EXCEL.[Tipos_paquetes] on [id_tipo_paquete] = [id_tipo]
 join GRAN_EXCEL.[Choferes] on [nro_legajo] = [nro_legajo]
@@ -59,23 +59,26 @@ group by [legajo_chofer_designado], [id_recorrido], [id_camion_designado], tiem_
 
 -- FK HECHO ARREGLO
 ALTER TABLE GRAN_EXCEL.BI_hecho_arreglo
-ADD CONSTRAINT FK_BI_taller FOREIGN KEY (id_tall) REFERENCES GRAN_EXCEL.BI_taller([id_taller]),
-	CONSTRAINT FK_BI_modelo FOREIGN KEY (id_mode) REFERENCES GRAN_EXCEL.BI_Modelo([id_modelo]),
-	CONSTRAINT FK_BI_tarea FOREIGN KEY (id_tare) REFERENCES GRAN_EXCEL.BI_tipo_tarea([id_tipo_tarea]),
-	CONSTRAINT FK_BI_camion FOREIGN KEY (id_cami) REFERENCES GRAN_EXCEL.BI_camion([id_camion]),
-	CONSTRAINT FK_BI_mecanico FOREIGN KEY (legajo_meca) REFERENCES GRAN_EXCEL.BI_mecanico([nro_legajo]),
-	CONSTRAINT FK_BI_marca FOREIGN KEY (id_marca) REFERENCES GRAN_EXCEL.BI_marca([id_marca]),
-	CONSTRAINT FK_BI_tiempo FOREIGN KEY (id_tiem) REFERENCES GRAN_EXCEL.BI_tiempo(tiem_id),
-	CONSTRAINT FK_BI_material FOREIGN KEY (id_mate) REFERENCES GRAN_EXCEL.BI_materiales([id_material])
+ADD CONSTRAINT FK_BI_DIM_TALLER FOREIGN KEY ([id_taller]) REFERENCES GRAN_EXCEL.BI_DIM_TALLER([id_taller]),
+	CONSTRAINT FK_BI_DIM_MODELO FOREIGN KEY ([id_modelo]) REFERENCES GRAN_EXCEL.BI_DIM_MODELO([id_modelo]),
+	CONSTRAINT FK_BI_DIM_TAREA FOREIGN KEY ([codigo]) REFERENCES GRAN_EXCEL.BI_DIM_TIPO_TAREA([id_tipo_tarea]),
+	CONSTRAINT FK_BI_DIM_CAMION FOREIGN KEY ([id_camion]) REFERENCES GRAN_EXCEL.BI_DIM_CAMION([id_camion]),
+	CONSTRAINT FK_BI_DIM_MECANICO FOREIGN KEY ([nro_legajo]) REFERENCES GRAN_EXCEL.BI_DIM_MECANICO([nro_legajo]),
+	CONSTRAINT FK_BI_DIM_MARCA FOREIGN KEY ([id_marca]) REFERENCES GRAN_EXCEL.BI_DIM_MARCA([id_marca]),
+	CONSTRAINT FK_BI_DIM_TIEMPO FOREIGN KEY (tiempo_id) REFERENCES GRAN_EXCEL.BI_DIM_TIEMPO(tiem_id),
+	CONSTRAINT FK_BI_DIM_MATERIAL FOREIGN KEY ([id_material]) REFERENCES GRAN_EXCEL.BI_DIM_MATERIAL([id_material])
 GO
 
 -- FK HECHO VIAJE
 ALTER TABLE GRAN_EXCEL.BI_hecho_envio
-ADD CONSTRAINT FK_BI_chofer FOREIGN KEY (legajo_chof) REFERENCES GRAN_EXCEL.BI_Chofer(chof_legajo),
-	CONSTRAINT FK_BI_recorrido FOREIGN KEY (id_reco) REFERENCES GRAN_EXCEL.BI_Recorrido(reco_id),
-	CONSTRAINT FK_BI_camion_viaje FOREIGN KEY (id_cami) REFERENCES GRAN_EXCEL.BI_Camion(cami_id),
-	CONSTRAINT FK_BI_tiempo_viaje FOREIGN KEY (id_tiem) REFERENCES GRAN_EXCEL.BI_tiempo(tiem_id)
+ADD CONSTRAINT FK_BI_DIM_CHOFER FOREIGN KEY ([nro_legajo]) REFERENCES GRAN_EXCEL.BI_DIM_CHOFER(chof_legajo),
+	CONSTRAINT FK_BI_DIM_RECORRIDO FOREIGN KEY ([id_recorrido]) REFERENCES GRAN_EXCEL.BI_DIM_RECORRIDO(reco_id),
+	CONSTRAINT FK_BI_camion_viaje FOREIGN KEY ([id_camion]) REFERENCES GRAN_EXCEL.BI_DIM_CAMION(cami_id),
+	CONSTRAINT FK_BI_tiempo_viaje FOREIGN KEY (tiempo_id) REFERENCES GRAN_EXCEL.BI_DIM_TIEMPO(tiem_id)
 GO
+
+
+
 
 -- VISTAS
 
