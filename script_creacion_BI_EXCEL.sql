@@ -194,12 +194,13 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_CHOFER(
 	[fecha_nacimiento] DATETIME2(3)	NOT NULL,
 	[costo_hora] INT			NOT NULL,
 	rango_edad NVARCHAR(10) NOT NULL,
+	[rango_edad_chofer] nvarchar(255) NOT NULL,
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_CHOFER
-	([nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], rango_edad) 
+	([nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], [rango_edad_chofer]) 
 	SELECT  
-	[nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], rango_edad, GRAN_EXCEL.getAgeRange([fecha_nacimiento]) 
+	[nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], [rango_edad_chofer], GRAN_EXCEL.getAgeRange([fecha_nacimiento]) 
 	FROM GRAN_EXCEL.[Choferes]
 
 --DIMENSION MECANICO
@@ -229,10 +230,11 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_MATERIAL (
 	[codigo] NVARCHAR(100) NOT NULL,
     [descripcion] NVARCHAR(255) NOT NULL,
     [precio] DECIMAL(18, 2) NOT NULL,
+	[cantidad_materiales] decimal(18,2) not null,
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_MATERIAL ([id_material], [codigo], [descripcion], [precio])
-	SELECT [id_material], [codigo], [descripcion], [precio] FROM GRAN_EXCEL.[Materiales]
+	SELECT [id_material], [codigo], [descripcion], [precio], [cantidad_materiales] FROM GRAN_EXCEL.[Materiales]
 
 --DIMENSION VIAJE_X_PAQUETE (Agregada)
 CREATE TABLE GRAN_EXCEL.BI_DIM_VIAJE_X_PAQUETE (

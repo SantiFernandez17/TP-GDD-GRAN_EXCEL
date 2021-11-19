@@ -230,7 +230,8 @@ CREATE TABLE [GRAN_EXCEL].[Materiales] (
     [id_material] INT IDENTITY(1,1),
     [descripcion] NVARCHAR(255) NOT NULL,
 	[codigo] NVARCHAR(100) NOT NULL,
-    [precio] DECIMAL(18,2) NOT NULL,	
+    [precio] DECIMAL(18,2) NOT NULL,
+	[cantidad_materiales] decimal(18,2) not null,	
     PRIMARY KEY (id_material)
 )
 
@@ -318,7 +319,8 @@ CREATE TABLE [GRAN_EXCEL].[Choferes] (
 	[telefono] INT NOT NULL,
 	[mail] NVARCHAR(255) NOT NULL,
 	[fecha_nacimiento] DATETIME2(3) NOT NULL,
-	[costo_hora] INT NOT NULL,	
+	[costo_hora] INT NOT NULL,
+	[rango_edad_chofer] nvarchar(255) NOT NULL,	
 	PRIMARY KEY(nro_legajo)
 )
 
