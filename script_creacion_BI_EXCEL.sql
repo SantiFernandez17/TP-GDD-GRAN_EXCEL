@@ -288,21 +288,21 @@ CREATE TABLE GRAN_EXCEL.[BI_hecho_arreglo](
 
 insert into GRAN_EXCEL.BI_hecho_arreglo
 select distinct tall_id, md1.mode_id, otxt_tarea, c.cami_id, m1.meca_legajo, marca_id, tiem_id, mxt_material, otxt_tiempo_real, tare_tiempo_estimado, mxt_cantidad
-from GRAN_EXCEL.OtXtarea
-join GRAN_EXCEL.BI_Tipo_Tarea on tare_id = otxt_tarea
-join GRAN_EXCEL.Tarea t1 on t1.tare_id = otxt_tarea
-join GRAN_EXCEL.BI_Mecanico m1 on m1.meca_legajo = otxt_mecanico
-join GRAN_EXCEL.Mecanico m on m1.meca_legajo = m.meca_legajo
-join GRAN_EXCEL.BI_Taller on m.meca_taller = tall_id
-join GRAN_EXCEL.BI_tiempo on year(otxt_fecha_inicio) = tiem_anio and DATEPART(quarter,otxt_fecha_inicio) = tiem_cuatri
-join GRAN_EXCEL.Orden_trabajo on otxt_orden_trabajo = ot_id
-join GRAN_EXCEL.Camion c on ot_camion = c.cami_id
-join GRAN_EXCEL.Modelo md1 on md1.mode_id = c.cami_modelo
-join GRAN_EXCEL.BI_Marca on md1.mode_marca = marca_nombre
-join GRAN_EXCEL.MaterialesXtarea on mxt_tarea = otxt_tarea
+from GRAN_EXCEL.[TareasXOrdenes]
+join GRAN_EXCEL.BI_DIM_TIPO_TAREA  on tare_id = otxt_tarea
+join GRAN_EXCEL.[Tareas] t1 on t1.tare_id = otxt_tarea
+join GRAN_EXCEL.BI_DIM_MECANICO m1 on m1.meca_legajo = otxt_mecanico
+join GRAN_EXCEL.[Mecanicos] m on m1.meca_legajo = m.meca_legajo
+join GRAN_EXCEL.BI_DIM_TALLER on m.meca_taller = tall_id
+join GRAN_EXCEL.BI_DIM_TIEMPO  on year(otxt_fecha_inicio) = tiem_anio and DATEPART(quarter,otxt_fecha_inicio) = tiem_cuatri
+join GRAN_EXCEL.[Ordenes] on otxt_orden_trabajo = ot_id
+join GRAN_EXCEL.[Camiones] c on ot_camion = c.cami_id
+join GRAN_EXCEL.[Modelos] md1 on md1.mode_id = c.cami_modelo
+join GRAN_EXCEL.BI_DIM_MARCA on md1.mode_marca = marca_nombre
+join GRAN_EXCEL.[MaterialesXTareas] on mxt_tarea = otxt_tarea
 
 
-CREATE TABLE [brog].[BI_hecho_envio](
+CREATE TABLE GRAN_EXCEL.[BI_hecho_envio](
   [legajo_chof] int,
   [id_reco] int,
   [id_cami] int,
@@ -312,7 +312,7 @@ CREATE TABLE [brog].[BI_hecho_envio](
   [tiempoDias] int 
 )
 
-insert into brog.BI_hecho_envio
+insert into GRAN_EXCEL.BI_hecho_envio
 select distinct viaj_chof, viaj_recorrido, viaj_camion, tiem_id, sum(paqx_cantidad * tipa_precio+reco_precio), viaj_consumo_combustible , datediff(day,viaj_fecha_inicio, viaj_fecha_fin)  --Los paso directamente desde la tabla viaje
 from GRAN_EXCEL.Viaje
 join GRAN_EXCEL.BI_tiempo on year(viaj_fecha_inicio) = tiem_anio and DATEPART(quarter,viaj_fecha_inicio) = tiem_cuatri
