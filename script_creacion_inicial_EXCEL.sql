@@ -320,7 +320,7 @@ CREATE TABLE [GRAN_EXCEL].[Choferes] (
 	[mail] NVARCHAR(255) NOT NULL,
 	[fecha_nacimiento] DATETIME2(3) NOT NULL,
 	[costo_hora] INT NOT NULL,
-	[rango_edad_chofer] nvarchar(255) NOT NULL,	
+	[rango_edad] NVARCHAR(10) NOT NULL,
 	PRIMARY KEY(nro_legajo)
 )
 
@@ -382,7 +382,6 @@ CREATE TABLE [GRAN_EXCEL].[PaquetesXViajes] (
 	[id_tipo_paquete] INT NOT NULL,
 	[id_viaje] INT NOT NULL,
 	[cantidad] INT NOT NULL,
-	[precioTotal] DECIMAL(18, 2) NOT NULL,
 	PRIMARY KEY(id_paquetes_x_viaje)
 )
 ALTER TABLE [GRAN_EXCEL].[PaquetesXViajes] ADD CONSTRAINT paqxviaj_id_paquete FOREIGN KEY (id_tipo_paquete) REFERENCES [GRAN_EXCEL].[Tipos_paquetes](id_tipo)
