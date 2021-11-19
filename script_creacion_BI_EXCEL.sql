@@ -359,7 +359,7 @@ as
 	select distinct  id_cami Camion , cuatrimestre Cuatrimestre, max(tiempo_arreglo) tiempoMaximo 
 	from GRAN_EXCEL.BI_hecho_arreglo
 	join GRAN_EXCEL.BI_DIM_TIEMPO on id_tiem = tiempo_id
-	group by tiem_cuatri,id_cami
+	group by cuatrimestre ,id_cami
 	
 go
 
@@ -372,9 +372,9 @@ as
 	
 	select id_Cami, id_tall, cuatrimestre, sum([cantidad_materiales] * [precio]) + (sum( [costo_hora] * 8 * tiempo_arreglo)/ count(distinct id_mate))  costoTotal
 	from GRAN_EXCEL.BI_hecho_arreglo
-	join GRAN_EXCEL.BI_DIM_TIEMPO on id_tiem = tiem_id
-	join GRAN_EXCEL.BI_DIM_MATERIAL on id_mate = mate_id
-	join GRAN_EXCEL.BI_DIM_MECANICO on meca_legajo = legajo_meca
+	join GRAN_EXCEL.BI_DIM_TIEMPO on id_tiem = tiempo_id
+	join GRAN_EXCEL.BI_DIM_MATERIAL on id_mate = [id_material]
+	join GRAN_EXCEL.BI_DIM_MECANICO on [nro_legajo] = legajo_meca
 	group by id_cami, id_tall, cuatrimestre
 	order by cuatrimestre, id_tall, id_cami
 	
@@ -441,7 +441,7 @@ GO
 create view GRAN_EXCEL.BI_costo_promedio_x_rango_etario_de_choferes
 as
 	select (select sum([costo_hora]) from GRAN_EXCEL.BI_DIM_CHOFER where [rango_edad_chofer] = c.[rango_edad_chofer])/ count(distinct [nro_legajo]) costo, [rango_edad_chofer] from GRAN_EXCEL.BI_hecho_envio
-	join GRAN_EXCEL.BI_DIM_CHOFER c on c.chof_legajo = legajo_chof
+	join GRAN_EXCEL.BI_DIM_CHOFER c on c.[nro_legajo] = legajo_chof
 	group by [rango_edad_chofer]
 
 go
