@@ -72,10 +72,15 @@ BEGIN
 	DECLARE @rango varchar(10);
 
 IF (MONTH(@dateofbirth)!=MONTH(GETDATE()))
+
 	SET @edad = DATEDIFF(MONTH, @dateofbirth, GETDATE())/12;
+
 ELSE IF(DAY(@dateofbirth) > DAY(GETDATE()))
+
 	SET @edad = (DATEDIFF(MONTH, @dateofbirth, GETDATE())/12)-1;
+
 ELSE 
+
 	SET @edad = DATEDIFF(MONTH, @dateofbirth, GETDATE())/12;
 
 IF (@edad>17 AND @edad<31)
