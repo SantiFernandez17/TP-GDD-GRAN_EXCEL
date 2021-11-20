@@ -1,5 +1,3 @@
-﻿--Todas las dimensiones de Microsoft SQL Server Analysis Services son grupos de atributos basados en columnas de tablas o vistas de una vista del origen de datos.
-
 USE GD2C2021
 
 go
@@ -12,8 +10,8 @@ IF OBJECT_ID ('GRAN_EXCEL.BI_hecho_envio', 'U') IS NOT NULL
 GO
 --DROP DE FUNCIONES------------------------------------------------------------
 
-IF EXISTS(SELECT [name] FROM sys.objects WHERE [name] = 'getAgeRange')
-	DROP FUNCTION GRAN_EXCEL.getAgeRange
+IF EXISTS(SELECT [name] FROM sys.objects WHERE [name] = 'obtenerEdad')
+	DROP FUNCTION GRAN_EXCEL.obtenerEdad
 
 --DROP DE TABLAS------------------------------------------------------------
 IF EXISTS(SELECT [name] FROM sys.tables WHERE [name] = 'BI_DIM_CAMION')
@@ -58,39 +56,43 @@ DROP TABLE GRAN_EXCEL.BI_FACT_ARREGLO_CAMION
 IF EXISTS(SELECT [name] FROM sys.tables WHERE [name] = 'BI_FACT_INFO_VIAJE')
 DROP TABLE GRAN_EXCEL.BI_FACT_INFO_VIAJE
 
---CREACIÓN DE FUNCIONES AUXILIARES--
+IF EXISTS(SELECT [name] FROM sys.tables WHERE [name] = 'BI_DIM_MATERIALESXTAREA')
+DROP TABLE GRAN_EXCEL.BI_DIM_MATERIALESXTAREA
+
+--CREACIÓN DE FUNCIONES
 GO
-CREATE FUNCTION GRAN_EXCEL.getAgeRange (@dateofbirth datetime2(3))
+CREATE FUNCTION GRAN_EXCEL.obtenerEdad (@dateofbirth datetime2(3))
 RETURNS varchar(10)												   		
 AS
 BEGIN
-	DECLARE @age int;
-	DECLARE @returnvalue varchar(10);
+	DECLARE @edad int;
+	DECLARE @rango varchar(10);
 
 IF (MONTH(@dateofbirth)!=MONTH(GETDATE()))
-	SET @age = DATEDIFF(MONTH, @dateofbirth, GETDATE())/12;
+	SET @edad = DATEDIFF(MONTH, @dateofbirth, GETDATE())/12;
 ELSE IF(DAY(@dateofbirth) > DAY(GETDATE()))
-	SET @age = (DATEDIFF(MONTH, @dateofbirth, GETDATE())/12)-1;
+	SET @edad = (DATEDIFF(MONTH, @dateofbirth, GETDATE())/12)-1;
 ELSE 
-	SET @age = DATEDIFF(MONTH, @dateofbirth, GETDATE())/12;
+	SET @edad = DATEDIFF(MONTH, @dateofbirth, GETDATE())/12;
 
-IF (@age > 17 AND @age <31)
+IF (@edad > 17 AND @edad <31)
 BEGIN
-	SET @returnvalue = '[18 - 30]';
+	SET @rango = '[18-30]';
 END
-ELSE IF (@age > 30 AND @age < 51)
+ELSE IF (@edad > 30 AND @edad < 51)
 BEGIN
-	SET @returnvalue = '[31 - 50]';
+	SET @rango = '[31-50]';
 END
-ELSE IF(@age > 50)
+ELSE IF(@edad > 50)
 BEGIN
-	SET @returnvalue = '+50';
+	SET @rango = '>50';
 END
 
-	RETURN @returnvalue;
+	RETURN @rango;
 END
 
 GO
+
 
 --Creación y migración de las tablas de las dimensiones
 
@@ -109,6 +111,7 @@ INSERT INTO GRAN_EXCEL.BI_DIM_TIEMPO (anio, cuatrimestre)
 	SELECT year([fecha_fin]),
 	DATEPART(quarter,[fecha_fin])
 	from GRAN_EXCEL.[TareasXOrdenes]
+
 
 --DIMENSION CAMION
 CREATE TABLE GRAN_EXCEL.BI_DIM_CAMION (
@@ -213,12 +216,11 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_CHOFER(
 	[mail] NVARCHAR(255)		NOT NULL,
 	[fecha_nacimiento] DATETIME2(3)	NOT NULL,
 	[costo_hora] INT			NOT NULL,
-	rango_edad NVARCHAR(10) NOT NULL,
 	[rango_edad_chofer] nvarchar(255) NOT NULL,
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_CHOFER
-	([nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], GRAN_EXCEL.getAgeRange([fecha_nacimiento]))--[rango_edad_chofer] 
+	([nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], [rango_edad_chofer] )
 	SELECT  
 	[nro_legajo], 
 	[nombre], 
@@ -229,8 +231,7 @@ INSERT INTO GRAN_EXCEL.BI_DIM_CHOFER
 	[mail], 
 	[fecha_nacimiento], 
 	[costo_hora], 
-	--[rango_edad_chofer], 
-	GRAN_EXCEL.getAgeRange([fecha_nacimiento]) 
+	GRAN_EXCEL.obtenerEdad([fecha_nacimiento]) 
 	from GRAN_EXCEL.[Choferes]
 
 --DIMENSION MECANICO
@@ -245,14 +246,15 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_MECANICO(
 	[mail] NVARCHAR(255) NOT NULL,
 	[fecha_nacimiento] DATETIME2(3) NOT NULL,
 	[costo_hora] INT NOT NULL,
-	rango_edad NVARCHAR(10) NOT NULL,
+	[rango_edad] NVARCHAR(10) NOT NULL,
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_MECANICO
-	([nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora])--[rango_edad] 
+	([nro_legajo], [nombre], [id_taller], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], [rango_edad])
 	SELECT  
 	[nro_legajo], 
 	[nombre], 
+	[id_taller],
 	[apellido], 
 	[dni], 
 	[direccion], 
@@ -260,8 +262,7 @@ INSERT INTO GRAN_EXCEL.BI_DIM_MECANICO
 	[mail], 
 	[fecha_nacimiento], 
 	[costo_hora], 
-	--[rango_edad], 
-	GRAN_EXCEL.getAgeRange(fecha_nacimiento) 
+	GRAN_EXCEL.obtenerEdad(fecha_nacimiento) 
 	from GRAN_EXCEL.[Mecanicos]
 
 --DIMENSION MATERIAL
@@ -288,10 +289,11 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_VIAJE_X_PAQUETE (
 	PRIMARY KEY ([id_paquetes_x_viaje])
 )
 
-INSERT INTO GRAN_EXCEL.BI_DIM_VIAJE_X_PAQUETE ([id_viaje], [id_paquetes_x_viaje], [cantidad])
+INSERT INTO GRAN_EXCEL.BI_DIM_VIAJE_X_PAQUETE ([id_viaje], [id_paquetes_x_viaje], [cantidad], [id_tipo_paquete])
 	SELECT [id_viaje], 
 	[id_paquetes_x_viaje], 
-	[cantidad] 
+	[cantidad],
+	[id_tipo_paquete]
 	from GRAN_EXCEL.[PaquetesXViajes]
 
 
@@ -315,10 +317,11 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_MATERIALESXTAREA(
 	PRIMARY KEY(id_materiales_x_tareas)
 )
 
+SET IDENTITY_INSERT [GD2C2021].[GRAN_EXCEL].[BI_DIM_MATERIALESXTAREA] ON
 INSERT INTO GRAN_EXCEL.BI_DIM_MATERIALESXTAREA ([id_materiales_x_tareas], [id_material], [id_tarea], [cantidad])
 	SELECT [id_materiales_x_tareas], [id_material], [id_tarea], [cantidad]
 	from GRAN_EXCEL.[MaterialesXTareas]
-
+SET IDENTITY_INSERT [GD2C2021].[GRAN_EXCEL].[BI_DIM_MATERIALESXTAREA] OFF
 
 	
 
@@ -333,30 +336,30 @@ CREATE TABLE GRAN_EXCEL.[BI_hecho_arreglo](
   [legajo_mecanicos] int,
   [id_de_marca] int,
   [id_de_tiempo] int,
-  [id_de_materiales] nvarchar(100),
+  [id_de_materiales] int,
   [tiempo_De_Arreglo] int,
   [tiempoEstimado] int,
   [materiales_cant] int  
 )
 
 insert into GRAN_EXCEL.BI_hecho_arreglo
-select distinct [id_taller], md1.[id_modelo], [id_tarea], c.[id_camion], m1.[nro_legajo], [id_marca], tiempo_id, [id_material], [tiempo_real_dias], [tiempoEstimado], [cantidad]
-from GRAN_EXCEL.[TareasXOrdenes]
+select distinct m.[id_taller], md1.[id_modelo], txo.[id_tarea], c.[id_camion], m1.[nro_legajo], md1.[id_marca], tiempo_id, [id_material], [tiempo_real_dias], [tiempo_estimado], [cantidad]
+from GRAN_EXCEL.[TareasXOrdenes] txo
 join GRAN_EXCEL.BI_DIM_TIPO_TAREA  on [id_tarea] = [id_tarea]
-join GRAN_EXCEL.[Tareas] t1 on t1.[id_tarea] = [id_tarea]
+join GRAN_EXCEL.[Tareas] t1 on t1.[codigo] = txo.[id_tarea]
 join GRAN_EXCEL.BI_DIM_MECANICO m1 on m1.[nro_legajo] = [legajo_mecanico]
 join GRAN_EXCEL.[Mecanicos] m on m1.[nro_legajo] = m.[nro_legajo]
-join GRAN_EXCEL.BI_DIM_TALLER on m.[id_taller] = [id_taller]
+join GRAN_EXCEL.BI_DIM_TALLER dt on m.[id_taller] = dt.[id_taller]
 join GRAN_EXCEL.BI_DIM_TIEMPO  on year([fecha_inicio]) = anio and DATEPART(quarter,[fecha_inicio]) = cuatrimestre
-join GRAN_EXCEL.[Ordenes] on [id_orden] = [nro_trabajo]
-join GRAN_EXCEL.[Camiones] c on [id_camion] = c.[id_camion]
+join GRAN_EXCEL.[Ordenes] ord on [id_orden] = [nro_trabajo]
+join GRAN_EXCEL.[Camiones] c on ord.[id_camion] = c.[id_camion]
 join GRAN_EXCEL.[Modelos] md1 on md1.[id_modelo] = c.[id_modelo]
-join GRAN_EXCEL.BI_DIM_MARCA on md1.[id_marca] = [id_modelo]
-join GRAN_EXCEL.[MaterialesXTareas] on [id_tarea] = [id_tarea]
+join GRAN_EXCEL.BI_DIM_MARCA bdm on md1.[id_marca] = bdm.[id_marca]
+join GRAN_EXCEL.[MaterialesXTareas] mxt on mxt.[id_tarea] = txo.[id_tarea]
 
 
 CREATE TABLE GRAN_EXCEL.[BI_hecho_envio](
-  [legajo_chofe] int,
+  [legajo_chofer] int,
   [id_del_recorrido] int,
   [id_de_camion] int,
   [id_de_tiempo] int,
@@ -366,14 +369,14 @@ CREATE TABLE GRAN_EXCEL.[BI_hecho_envio](
 )
 
 insert into GRAN_EXCEL.BI_hecho_envio
-select distinct [legajo_chofer_designado], [id_recorrido], [id_camion_designado], tiempo_id, sum([cantidad] * [precio]+[precio]), [consumo_combustible] , datediff(day,[fecha_inicio], [fecha_fin])  -- un precio es de tipo de paquete y otro de recorrido
-from GRAN_EXCEL.[Viajes]
+select distinct [legajo_chofer_designado], v.[id_recorrido], [id_camion_designado], tiempo_id, sum([cantidad] * bdr.[precio]+tp.[precio]), [consumo_combustible] , datediff(day,[fecha_inicio], [fecha_fin])  -- un precio es de tipo de paquete y otro de recorrido
+from GRAN_EXCEL.[Viajes] v
 join GRAN_EXCEL.BI_DIM_TIEMPO on year([fecha_inicio]) = anio and DATEPART(quarter,[fecha_inicio]) = cuatrimestre
-join GRAN_EXCEL.[PaquetesXViajes] on [id_viaje] = [id_viaje]
-join GRAN_EXCEL.[Tipos_paquetes] on [id_tipo_paquete] = [id_tipo]
+join GRAN_EXCEL.[PaquetesXViajes] pxv on pxv.[id_viaje] = v.[id_viaje]
+join GRAN_EXCEL.[Tipos_paquetes] tp on [id_tipo_paquete] = [id_tipo]
 join GRAN_EXCEL.[Choferes] on [legajo_chofer_designado] = [nro_legajo]
-join GRAN_EXCEL.BI_DIM_RECORRIDO  on [id_recorrido] = [id_recorrido]
-group by [legajo_chofer_designado], [id_recorrido], [id_camion_designado], tiempo_id, [consumo_combustible],[fecha_inicio], [fecha_fin]
+join GRAN_EXCEL.BI_DIM_RECORRIDO bdr on bdr.[id_recorrido] = v.[id_recorrido]
+group by [legajo_chofer_designado], v.[id_recorrido], [id_camion_designado], tiempo_id, [consumo_combustible],[fecha_inicio], [fecha_fin]
 
 
 -- DESARROLLO DE CONSTRAINTS
@@ -383,26 +386,26 @@ group by [legajo_chofer_designado], [id_recorrido], [id_camion_designado], tiemp
 ALTER TABLE GRAN_EXCEL.BI_hecho_arreglo
 ADD CONSTRAINT FK_BI_DIM_TALLER FOREIGN KEY ([id_del_taller]) REFERENCES GRAN_EXCEL.BI_DIM_TALLER([id_taller]),
 	CONSTRAINT FK_BI_DIM_MODELO FOREIGN KEY (id_de_modelo) REFERENCES GRAN_EXCEL.BI_DIM_MODELO([id_modelo]),
-	CONSTRAINT FK_BI_DIM_TAREA FOREIGN KEY (id_de_tarea) REFERENCES GRAN_EXCEL.BI_DIM_TIPO_TAREA([id_tipo_tarea]),
+	CONSTRAINT FK_BI_DIM_TAREA FOREIGN KEY (id_de_tarea) REFERENCES GRAN_EXCEL.BI_DIM_TAREA([codigo]),
 	CONSTRAINT FK_BI_DIM_CAMION FOREIGN KEY (id_de_camion) REFERENCES GRAN_EXCEL.BI_DIM_CAMION([id_camion]),
 	CONSTRAINT FK_BI_DIM_MECANICO FOREIGN KEY (legajo_mecanicos) REFERENCES GRAN_EXCEL.BI_DIM_MECANICO([nro_legajo]),
 	CONSTRAINT FK_BI_DIM_MARCA FOREIGN KEY (id_de_marca) REFERENCES GRAN_EXCEL.BI_DIM_MARCA([id_marca]),
-	CONSTRAINT FK_BI_DIM_TIEMPO FOREIGN KEY (id_de_tiempo) REFERENCES GRAN_EXCEL.BI_DIM_TIEMPO(tiem_id),
-	CONSTRAINT FK_BI_DIM_MATERIAL FOREIGN KEY (id_mate) REFERENCES GRAN_EXCEL.BI_DIM_MATERIAL([id_material])
+	CONSTRAINT FK_BI_DIM_TIEMPO FOREIGN KEY (id_de_tiempo) REFERENCES GRAN_EXCEL.BI_DIM_TIEMPO([tiempo_id]),
+	CONSTRAINT FK_BI_DIM_MATERIAL FOREIGN KEY (id_de_materiales) REFERENCES GRAN_EXCEL.BI_DIM_MATERIAL([id_material])
 GO
 
 -- FOREIGN KEY DEL HECHO VIAJE
 
 ALTER TABLE GRAN_EXCEL.BI_hecho_envio
-ADD CONSTRAINT FK_BI_DIM_CHOFER FOREIGN KEY (legajo_chofe) REFERENCES GRAN_EXCEL.BI_DIM_CHOFER(chof_legajo),
-	CONSTRAINT FK_BI_DIM_RECORRIDO FOREIGN KEY (id_del_recorrido) REFERENCES GRAN_EXCEL.BI_DIM_RECORRIDO(reco_id),
-	CONSTRAINT FK_BI_camion_viaje FOREIGN KEY (id_de_camion) REFERENCES GRAN_EXCEL.BI_DIM_CAMION(cami_id),
-	CONSTRAINT FK_BI_tiempo_viaje FOREIGN KEY (id_de_tiempo) REFERENCES GRAN_EXCEL.BI_DIM_TIEMPO(tiem_id)
+ADD CONSTRAINT FK_BI_DIM_CHOFER FOREIGN KEY (legajo_chofer) REFERENCES GRAN_EXCEL.BI_DIM_CHOFER(nro_legajo),
+	CONSTRAINT FK_BI_DIM_RECORRIDO FOREIGN KEY (id_del_recorrido) REFERENCES GRAN_EXCEL.BI_DIM_RECORRIDO(id_recorrido),
+	CONSTRAINT FK_BI_camion_viaje FOREIGN KEY (id_de_camion) REFERENCES GRAN_EXCEL.BI_DIM_CAMION(id_camion),
+	CONSTRAINT FK_BI_tiempo_viaje FOREIGN KEY (id_de_tiempo) REFERENCES GRAN_EXCEL.BI_DIM_TIEMPO(tiempo_id)
 GO
 
 
 
--- DESARROLLO DE LAS VISTAS
+-- VISTAS
 
 
 IF OBJECT_ID ('GRAN_EXCEL.BI_tiempo_maximo_fuera_de_servicio', 'V') IS NOT NULL  
@@ -506,7 +509,7 @@ as
 	from GRAN_EXCEL.BI_DIM_CHOFER 
 	where [rango_edad_chofer] = c.[rango_edad_chofer])/ count(distinct [nro_legajo]) costo, [rango_edad_chofer] 
 	from GRAN_EXCEL.BI_hecho_envio
-	join GRAN_EXCEL.BI_DIM_CHOFER c on c.[nro_legajo] = legajo_chofe
+	join GRAN_EXCEL.BI_DIM_CHOFER c on c.[nro_legajo] = legajo_chofer
 	group by [rango_edad_chofer]
 
 go
@@ -517,13 +520,12 @@ IF OBJECT_ID ('GRAN_EXCEL.BI_ganancia_por_camion', 'V') IS NOT NULL
 GO
 create view GRAN_EXCEL.BI_ganancia_por_camion
 as
-	select e.id_de_camion, sum(e.ingresos) - sum((e.consumo*100)+(e.tiempoEnDias * 8 * [costo_hora])) - sum(materiales_cant * [precio]) + (sum( [costo_hora] * 8 * tiempo_De_Arreglo)/count(distinct [id_material])) AS 'Ganancia' 
+	select e.id_de_camion, sum(e.ingresos) - sum((e.consumo*100)+(e.tiempoEnDias * 8 * bc.[costo_hora])) - sum(materiales_cant * [precio]) + (sum( bm.[costo_hora] * 8 * tiempo_De_Arreglo)/count(distinct [id_material])) AS 'Ganancia' 
 	from GRAN_EXCEL.BI_hecho_envio e
-	join GRAN_EXCEL.BI_DIM_CHOFER on e.legajo_chofe = [nro_legajo]
+	join GRAN_EXCEL.BI_DIM_CHOFER bc on e.legajo_chofer = [nro_legajo]
 	join GRAN_EXCEL.BI_hecho_arreglo a on a.id_de_camion = e.id_de_camion
 	join GRAN_EXCEL.BI_DIM_MATERIAL on a.id_de_materiales = [id_material]
-	join GRAN_EXCEL.BI_DIM_MECANICO on [nro_legajo] = a.legajo_mecanicos
+	join GRAN_EXCEL.BI_DIM_MECANICO bm on bm.[nro_legajo] = a.legajo_mecanicos
 	group by e.id_de_camion
 
 go
-
