@@ -145,8 +145,8 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_MODELO(
 	[camion] NVARCHAR(255) NOT NULL,
 	[velocidad_max] INT NOT NULL,
 	[capacidad_tanque] INT NOT NULL,
-	[capacidad_carga] INT NOT NULL
-	--[id_marca] INT NOT NULL
+	[capacidad_carga] INT NOT NULL,
+	[id_marca] INT NOT NULL
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_MODELO([id_modelo], [camion], [velocidad_max], [capacidad_tanque], [capacidad_carga], [id_marca])
@@ -219,7 +219,7 @@ CREATE TABLE GRAN_EXCEL.BI_DIM_CHOFER(
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_CHOFER
-	([nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], GRAN_EXCEL.getAgeRange([fecha_nacimiento])--[rango_edad_chofer] 
+	([nro_legajo], [nombre], [apellido], [dni], [direccion], [telefono], [mail], [fecha_nacimiento], [costo_hora], GRAN_EXCEL.getAgeRange([fecha_nacimiento]))--[rango_edad_chofer] 
 	SELECT  
 	[nro_legajo], 
 	[nombre], 

@@ -231,7 +231,6 @@ CREATE TABLE [GRAN_EXCEL].[Materiales] (
     [descripcion] NVARCHAR(255) NOT NULL,
 	[codigo] NVARCHAR(100) NOT NULL,
     [precio] DECIMAL(18,2) NOT NULL,
-	[cantidad_materiales] decimal(18,2) not null,	
     PRIMARY KEY (id_material)
 )
 
