@@ -375,11 +375,12 @@ ALTER TABLE [GRAN_EXCEL].[Paquetes] ADD CONSTRAINT paquetes_id_viaje FOREIGN KEY
 ALTER TABLE [GRAN_EXCEL].[Paquetes] ADD CONSTRAINT paquetes_id_tipo FOREIGN KEY (id_tipo) REFERENCES [GRAN_EXCEL].[Tipos_paquetes](id_tipo)
 */
 
-CREATE TABLE los_desnormalizados.Paquete (
-	paquete_id INT IDENTITY(1,1) PRIMARY KEY,
-	tipo_paquete_id INT NOT NULL,
-	FOREIGN KEY (tipo_paquete_id) REFERENCES los_desnormalizados.Tipo_paquete(tipo_paquete_id)
+CREATE TABLE [GRAN_EXCEL].[Paquetes] (
+	[id_paquete] INT IDENTITY(1,1) PRIMARY KEY,
+	[id_tipo] INT NOT NULL,
+	FOREIGN KEY ([id_tipo]) REFERENCES [GRAN_EXCEL].[Tipos_paquetes]([id_tipo])
 )
+
 
 CREATE TABLE [GRAN_EXCEL].[PaquetesXViajes] (
 	[id_paquetes_x_viaje] INT IDENTITY(1,1),
@@ -589,8 +590,10 @@ AS
 GO
 
 
+	 
 CREATE PROCEDURE [GRAN_EXCEL].[sp_carga_viajes]
 AS
+
 /*
 VIEJO
     INSERT INTO [GRAN_EXCEL].[Viajes](fecha_inicio, fecha_fin, consumo_combustible, id_camion_designado, legajo_chofer_designado, id_recorrido)
@@ -606,9 +609,6 @@ VIEJO
 	AND r.km = m.[RECORRIDO_KM]
 	AND r.precio = m.[RECORRIDO_PRECIO]
 	*/
-	 
-CREATE PROCEDURE [GRAN_EXCEL].[sp_carga_viajes]
-AS
     INSERT INTO [GRAN_EXCEL].[Viajes](fecha_inicio, fecha_fin, consumo_combustible, id_camion_designado, legajo_chofer_designado, id_recorrido)
 	SELECT DISTINCT c.id_camion_designado, r.id_recorrido, ch.legajo_chofer_designado, fecha_inicio, fecha_fin, consumo_combustible
 	FROM [gd_esquema].[Maestra] m
@@ -654,6 +654,16 @@ AS
 	AND m.[PAQUETE_ANCHO_MAX] IS NOT NULL
 	AND m.[PAQUETE_LARGO_MAX] IS NOT NULL
 	AND m.[PAQUETE_PRECIO] IS NOT NULL
+GO
+
+
+CREATE PROCEDURE [GRAN_EXCEL].[sp_carga_paquetes]
+AS
+INSERT INTO [GRAN_EXCEL].[Paquetes] ([id_tipo])
+
+	SELECT [id_tipo]
+	FROM [GRAN_EXCEL].[Tipos_paquetes]
+
 GO
 
 
