@@ -677,6 +677,29 @@ AS
 	join [GRAN_EXCEL].[Tipos_paquetes] t on t.descripcion = m.[PAQUETE_DESCRIPCION]
 	WHERE m.[PAQUETE_CANTIDAD] IS NOT NULL
 	GROUP BY t.id_tipo, v.id_viaje
+
+	/*
+	CREATE PROCEDURE [GRAN_EXCEL].[sp_carga_paquetes_x_viaje]
+AS
+    INSERT INTO [GRAN_EXCEL].[PaquetesXViajes](cantidad, id_tipo_paquete, id_viaje)
+			
+	SELECT DISTINCT [id_paquete], [id_viaje], SUM([PAQUETE_CANTIDAD]), SUM([PAQUETE_CANTIDAD]) * tp.[precio] + r.[precio]
+
+	FROM [gd_esquema].[Maestra] m
+
+	join [GRAN_EXCEL].[Camiones] cam ON (m.[CAMION_PATENTE] = cam.patente)
+
+	join [GRAN_EXCEL].[Viajes] v ON (v.fecha_inicio = m.[VIAJE_FECHA_INICIO] and cam.id_camion = v.id_camion_designado)
+
+	join [GRAN_EXCEL].[Tipos_paquetes] tp on tp.descripcion = m.[PAQUETE_DESCRIPCION]
+
+	JOIN [GRAN_EXCEL].[Paquetes] p ON (p.[id_tipo] = tp.[id_tipo])
+
+	WHERE m.[PAQUETE_CANTIDAD] IS NOT NULL
+
+	GROUP BY [id_viaje], [id_paquete], tp.[precio], r.[precio]
+GO
+	*/
 GO
 
 
