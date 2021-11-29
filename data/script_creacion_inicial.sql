@@ -585,6 +585,7 @@ GO
 
 CREATE PROCEDURE [GRAN_EXCEL].[sp_carga_viajes]
 AS
+/*
     INSERT INTO [GRAN_EXCEL].[Viajes](fecha_inicio, fecha_fin, consumo_combustible, id_camion_designado, legajo_chofer_designado, id_recorrido)
 	SELECT m.[VIAJE_FECHA_INICIO], m.[VIAJE_FECHA_FIN], m.[VIAJE_CONSUMO_COMBUSTIBLE], cam.id_camion, cho.nro_legajo, r.id_recorrido
 	FROM [gd_esquema].[Maestra] m, [GRAN_EXCEL].[Camiones] cam, [GRAN_EXCEL].[Choferes] cho, [GRAN_EXCEL].[Recorridos] r, [GRAN_EXCEL].[Ciudades] c, [GRAN_EXCEL].[Ciudades] c2
@@ -597,12 +598,12 @@ AS
 	AND c2.nombre = m.[RECORRIDO_CIUDAD_DESTINO]
 	AND r.km = m.[RECORRIDO_KM]
 	AND r.precio = m.[RECORRIDO_PRECIO]
-
-	 /*
+	*/
+	 
 	 CREATE PROCEDURE [GRAN_EXCEL].[sp_carga_viajes]
 AS
     INSERT INTO [GRAN_EXCEL].[Viajes](fecha_inicio, fecha_fin, consumo_combustible, id_camion_designado, legajo_chofer_designado, id_recorrido)
-	SELECT DISTINCT c.id_camion_designado, r.id_recorrido, ch.legajo_chofer_designado, [fecha_inicio], [fecha_fin], [consumo_combustible]
+	SELECT DISTINCT c.id_camion_designado, r.id_recorrido, ch.legajo_chofer_designado, fecha_inicio, fecha_fin, consumo_combustible
 	FROM [gd_esquema].[Maestra] m
 	JOIN [GRAN_EXCEL].[Camiones] c ON (m.[CAMION_PATENTE] = c.patente)
 	JOIN [GRAN_EXCEL].[Ciudades] c1 ON (c1_[nombre] = m.[RECORRIDO_CIUDAD_ORIGEN])
@@ -611,11 +612,7 @@ AS
 	JOIN [GRAN_EXCEL].[Choferes] ch ON (ch.[nro_legajo] = m.[CHOFER_NRO_LEGAJO])
 	WHERE [VIAJE_FECHA_INICIO] IS NOT NULL
 
-CREO QUE ES ASI
 	 
-	 
-	 
-	 */
 GO
 
 
