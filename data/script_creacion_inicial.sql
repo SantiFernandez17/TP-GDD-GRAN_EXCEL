@@ -597,6 +597,25 @@ AS
 	AND c2.nombre = m.[RECORRIDO_CIUDAD_DESTINO]
 	AND r.km = m.[RECORRIDO_KM]
 	AND r.precio = m.[RECORRIDO_PRECIO]
+
+	 /*
+	 CREATE PROCEDURE [GRAN_EXCEL].[sp_carga_viajes]
+AS
+    INSERT INTO [GRAN_EXCEL].[Viajes](fecha_inicio, fecha_fin, consumo_combustible, id_camion_designado, legajo_chofer_designado, id_recorrido)
+	SELECT DISTINCT c.id_camion_designado, r.id_recorrido, ch.legajo_chofer_designado, [fecha_inicio], [fecha_fin], [consumo_combustible]
+	FROM [gd_esquema].[Maestra] m
+	JOIN [GRAN_EXCEL].[Camiones] c ON (m.[CAMION_PATENTE] = c.patente)
+	JOIN [GRAN_EXCEL].[Ciudades] c1 ON (c1_[nombre] = m.[RECORRIDO_CIUDAD_ORIGEN])
+	JOIN [GRAN_EXCEL].[Ciudades] c2 ON (c2.[nombre] = m.[RECORRIDO_CIUDAD_DESTINO])
+	JOIN [GRAN_EXCEL].[Recorridos] r ON (c1.[id_ciudad] = r.[id_ciudad_origen] AND c2.[id_ciudad] = r.[id_ciudad_destino])
+	JOIN [GRAN_EXCEL].[Choferes] ch ON (ch.[nro_legajo] = m.[CHOFER_NRO_LEGAJO])
+	WHERE [VIAJE_FECHA_INICIO] IS NOT NULL
+
+CREO QUE ES ASI
+	 
+	 
+	 
+	 */
 GO
 
 
