@@ -50,12 +50,26 @@ BEGIN
 	DROP TABLE GRAN_EXCEL.PaquetesXViajes
 END
 
-IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'GRAN_EXCEL.Paquetes'))
+/*IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'GRAN_EXCEL.Paquetes'))
 BEGIN
 	ALTER TABLE GRAN_EXCEL.Paquetes DROP CONSTRAINT paquetes_id_viaje;
 	ALTER TABLE GRAN_EXCEL.Paquetes DROP CONSTRAINT paquetes_id_tipo;
 	DROP TABLE GRAN_EXCEL.Paquetes
 END
+CREATE TABLE [GRAN_EXCEL].[Paquetes] (
+	[id_paquete] INT IDENTITY(1,1) PRIMARY KEY,
+	[id_tipo] INT NOT NULL,
+	FOREIGN KEY ([id_tipo]) REFERENCES [GRAN_EXCEL].[Tipos_paquetes]([id_tipo])
+)
+LO DE ABAJO AGREGUE
+*/
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'GRAN_EXCEL.Paquetes'))
+BEGIN
+	ALTER TABLE GRAN_EXCEL.Paquetes DROP CONSTRAINT [id_paquete];
+	ALTER TABLE GRAN_EXCEL.Paquetes DROP CONSTRAINT [id_tipo];
+	DROP TABLE GRAN_EXCEL.Paquetes
+END
+
 
 IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'GRAN_EXCEL.Tipos_paquetes'))
 BEGIN
@@ -201,6 +215,12 @@ IF (OBJECT_ID('GRAN_EXCEL.sp_carga_tipos_paquetes') IS NOT NULL)
 	DROP PROCEDURE GRAN_EXCEL.sp_carga_tipos_paquetes
 GO
 
+IF (OBJECT_ID('GRAN_EXCEL.sp_carga_paquetes') IS NOT NULL)
+	DROP PROCEDURE GRAN_EXCEL.sp_carga_paquetes
+GO
+
+---- este de aca arriba agregue
+
 IF (OBJECT_ID('GRAN_EXCEL.sp_carga_paquetes_x_viaje') IS NOT NULL)
 	DROP PROCEDURE GRAN_EXCEL.sp_carga_paquetes_x_viaje
 GO
@@ -220,6 +240,8 @@ GO
 IF (OBJECT_ID('GRAN_EXCEL.sp_carga_materiales_x_tarea') IS NOT NULL)
 	DROP PROCEDURE GRAN_EXCEL.sp_carga_materiales_x_tarea
 GO
+
+
 
 
 /*****************************************
@@ -593,7 +615,6 @@ GO
 	 
 CREATE PROCEDURE [GRAN_EXCEL].[sp_carga_viajes]
 AS
-
 /*
 VIEJO
     INSERT INTO [GRAN_EXCEL].[Viajes](fecha_inicio, fecha_fin, consumo_combustible, id_camion_designado, legajo_chofer_designado, id_recorrido)
@@ -612,11 +633,11 @@ VIEJO
     INSERT INTO [GRAN_EXCEL].[Viajes](fecha_inicio, fecha_fin, consumo_combustible, id_camion_designado, legajo_chofer_designado, id_recorrido)
 	SELECT DISTINCT c.id_camion_designado, r.id_recorrido, ch.legajo_chofer_designado, fecha_inicio, fecha_fin, consumo_combustible
 	FROM [gd_esquema].[Maestra] m
-	JOIN [GRAN_EXCEL].[Camiones] c ON (m.[CAMION_PATENTE] = c.patente)
-	JOIN [GRAN_EXCEL].[Ciudades] c1 ON (c1_[nombre] = m.[RECORRIDO_CIUDAD_ORIGEN])
-	JOIN [GRAN_EXCEL].[Ciudades] c2 ON (c2.[nombre] = m.[RECORRIDO_CIUDAD_DESTINO])
-	JOIN [GRAN_EXCEL].[Recorridos] r ON (c1.[id_ciudad] = r.[id_ciudad_origen] AND c2.[id_ciudad] = r.[id_ciudad_destino])
-	JOIN [GRAN_EXCEL].[Choferes] ch ON (ch.[nro_legajo] = m.[CHOFER_NRO_LEGAJO])
+	JOIN [GRAN_EXCEL].[Camiones] c ON m.[CAMION_PATENTE] = c.patente
+	JOIN [GRAN_EXCEL].[Ciudades] c1 ON c1_[nombre] = m.[RECORRIDO_CIUDAD_ORIGEN] -- esto no se porque me marca error
+	JOIN [GRAN_EXCEL].[Ciudades] c2 ON c2.[nombre] = m.[RECORRIDO_CIUDAD_DESTINO]
+	JOIN [GRAN_EXCEL].[Recorridos] r ON c1.[id_ciudad] = r.[id_ciudad_origen] AND c2.[id_ciudad] = r.[id_ciudad_destino]
+	JOIN [GRAN_EXCEL].[Choferes] ch ON ch.[nro_legajo] = m.[CHOFER_NRO_LEGAJO]
 	WHERE [VIAJE_FECHA_INICIO] IS NOT NULL
 
 GO
@@ -662,7 +683,7 @@ AS
 INSERT INTO [GRAN_EXCEL].[Paquetes] ([id_tipo])
 
 	SELECT [id_tipo]
-	FROM [GRAN_EXCEL].[Tipos_paquetes]
+	FROM [GRAN_EXCEL].[Paquetes]
 
 GO
 
@@ -678,7 +699,7 @@ AS
 	WHERE m.[PAQUETE_CANTIDAD] IS NOT NULL
 	GROUP BY t.id_tipo, v.id_viaje
 
-	/*
+	/*EL QUE ESTA BIEN ES EL COMENTADO
 	CREATE PROCEDURE [GRAN_EXCEL].[sp_carga_paquetes_x_viaje]
 AS
     INSERT INTO [GRAN_EXCEL].[PaquetesXViajes](cantidad, id_tipo_paquete, id_viaje)
@@ -772,11 +793,13 @@ EXEC [GRAN_EXCEL].[sp_carga_viajes]
 EXEC [GRAN_EXCEL].[sp_carga_estados_trabajo]
 EXEC [GRAN_EXCEL].[sp_carga_ordenes]
 EXEC [GRAN_EXCEL].[sp_carga_tipos_paquetes]
+EXEC [GRAN_EXCEL].[sp_carga_paquetes] -- este agregue
 EXEC [GRAN_EXCEL].[sp_carga_paquetes_x_viaje]
 EXEC [GRAN_EXCEL].[sp_carga_tipos_tareas]
 EXEC [GRAN_EXCEL].[sp_carga_tareas]
 EXEC [GRAN_EXCEL].[sp_carga_tareas_x_ordenes]
 EXEC [GRAN_EXCEL].[sp_carga_materiales_x_tarea]
+
     
 GO
 
