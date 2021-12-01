@@ -343,7 +343,7 @@ from GRAN_EXCEL.BI_DIM_MATERIAL mat
 where mat.[id_material] = mat2.[id_material]
 )
 from GRAN_EXCEL.[TareasXOrdenes] txo
-join GRAN_EXCEL.BI_DIM_TIPO_TAREA dta on dta.[id_tipo_tarea] = txo.[id_tarea]
+--join GRAN_EXCEL.BI_DIM_TIPO_TAREA dta on dta.[id_tipo_tarea] = txo.[id_tarea]
 join GRAN_EXCEL.[Tareas] t1 on t1.[codigo] = txo.[id_tarea]
 join GRAN_EXCEL.BI_DIM_RANGO_ETARIO m1 on m1.[legajo] = [legajo_mecanico]
 join GRAN_EXCEL.[Mecanicos] m on m1.[legajo] = m.[nro_legajo]
