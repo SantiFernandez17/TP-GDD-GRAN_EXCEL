@@ -339,26 +339,26 @@ CREATE TABLE GRAN_EXCEL.[BI_hecho_arreglo](
 )
 
 insert into GRAN_EXCEL.BI_hecho_arreglo
-select distinct [id_taller], md1.[id_modelo], txo.[id_tarea], c.[id_camion], m1.[nro_legajo], md1.[id_marca], tiempo_id, [id_material], [tiempo_real_dias], [tiempo_estimado], [cantidad],
+select distinct dt.[id_taller], md1.[id_modelo], txo.[id_tarea], c.[id_camion], m1.[nro_legajo], md1.[id_marca], tiempo_id, [id_material], txo.[tiempo_real_dias], [tiempo_estimado], [cantidad],
 (
 select SUM(mat.[precio]) + SUM(m.[costo_hora])*[tiempo_real_dias]*8
 from GRAN_EXCEL.BI_DIM_MATERIALES mat
 where mat.[id_material] = mat2.[id_material]
 )
 from GRAN_EXCEL.[TareasXOrdenes] txo
-join GRAN_EXCEL.BI_DIM_TIPO_TAREA  on [id_tarea] = txo.[id_tarea]
+join GRAN_EXCEL.BI_DIM_TIPO_TAREA on t1.[id_tarea] = txo.[id_tarea]
 join GRAN_EXCEL.[Tareas] t1 on t1.[codigo] = txo.[id_tarea]
 join GRAN_EXCEL.BI_DIM_RANGO_ETARIO m1 on m1.[nro_legajo] = [legajo_mecanico]
 join GRAN_EXCEL.[Mecanicos] m on m1.[nro_legajo] = m.[nro_legajo]
-join GRAN_EXCEL.BI_DIM_TALLER dt on m.[id_taller] = [id_taller]
+join GRAN_EXCEL.BI_DIM_TALLER dt on m.[id_taller] = dt.[id_taller]
 join GRAN_EXCEL.BI_DIM_TIEMPO  on year([fecha_inicio]) = anio and DATEPART(quarter,[fecha_inicio]) = cuatrimestre
-join GRAN_EXCEL.[Ordenes] ord on [id_orden] = [nro_trabajo]
+join GRAN_EXCEL.[Ordenes] ord on txo.[id_orden] = ord.[nro_trabajo]
 join GRAN_EXCEL.[Camiones] c on ord.[id_camion] = c.[id_camion]
 join GRAN_EXCEL.[Modelos] md1 on md1.[id_modelo] = c.[id_modelo]
 join GRAN_EXCEL.BI_DIM_MARCA bdm on md1.[id_marca] = bdm.[id_marca]
 join GRAN_EXCEL.[MaterialesXTareas] mxt on mxt.[id_tarea] = txo.[id_tarea]
 join GRAN_EXCEL.[Materiales] mat2 on mxt.[id_tarea] = txo.[id_tarea]
-group by [id_taller], md1.[id_modelo], txo.[id_tarea], c.[id_camion], m1.[nro_legajo], md1.[id_marca], tiempo_id, [id_material], [tiempo_real_dias], [tiempo_estimado], [cantidad], mat2.[id_material]
+group by dt.[id_taller], md1.[id_modelo], txo.[id_tarea], c.[id_camion], m1.[nro_legajo], md1.[id_marca], tiempo_id, [id_material], [tiempo_real_dias], [tiempo_estimado], [cantidad], mat2.[id_material]
 
 
 CREATE TABLE GRAN_EXCEL.[BI_hecho_envio](
