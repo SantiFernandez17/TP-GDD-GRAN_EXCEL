@@ -504,14 +504,17 @@ IF OBJECT_ID ('GRAN_EXCEL.BI_costo_promedio_por_rango_etario_de_choferes', 'V') 
 GO
 create view GRAN_EXCEL.BI_costo_promedio_por_rango_etario_de_choferes
 as
-	select (select sum([costo_hora])
-	from GRAN_EXCEL.[Choferes]
-	where [rango_edad_chofer] = c.[rango_edad_chofer])/ count(distinct [legajo]) costo, [rango_edad_chofer] 
+	select (select sum([costo_hora]) from GRAN_EXCEL.[Choferes]) --where [rango_edad] = c.[rango_edad] lo comento porque creo que no va
+	/
+	count(distinct [nro_legajo]) AS 'Costo',
+	[rango_edad] 
 	from GRAN_EXCEL.BI_hecho_envio
-	join GRAN_EXCEL.BI_DIM_RANGO_ETAREO c on c.[legajo] = legajo_chofer
-	group by [rango_edad_chofer]
+	JOIN GRAN_EXCEL.BI_DIM_RANGO_ETARIO c on c.[legajo] = [legajo_chofer]
+	JOIN GRAN_EXCEL.[Choferes] on [nro_legajo] = c.[legajo]
+	group by [rango_edad]
 
 go
+
 
 
 IF OBJECT_ID ('GRAN_EXCEL.BI_ganancia_por_camion', 'V') IS NOT NULL  
