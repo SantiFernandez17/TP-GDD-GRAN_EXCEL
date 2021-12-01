@@ -368,17 +368,21 @@ CREATE TABLE GRAN_EXCEL.[BI_hecho_envio](
 )
 
 insert into GRAN_EXCEL.BI_hecho_envio
-select distinct [legajo], [id_recorrido], [id_camion], tiempo_id, 
-(select sum([cantidad] * tp.[precio]) + [precio] from GRAN_EXCEL.[PaquetesXViajes] join GRAN_EXCEL.[Tipos_paquetes] on pxv.[id_tipo_paquete] = [id_tipo] where pxv.[id_viaje] = v.[id_viaje]),
+select distinct [legajo], br.[id_recorrido], [id_camion], tiempo_id, 
+(
+select sum([cantidad] * tp2.[precio]) + br.[precio] from GRAN_EXCEL.[PaquetesXViajes]
+join GRAN_EXCEL.[Tipos_paquetes] tp2 on [id_tipo_paquete] = tp2.[id_tipo] where [id_viaje] = v.[id_viaje]
+),
 sum([costo_hora])*datediff(day,[fecha_inicio], [fecha_fin])*8 + sum([consumo_combustible])*100
 from GRAN_EXCEL.[Viajes] v
 join GRAN_EXCEL.BI_DIM_TIEMPO on year([fecha_inicio]) = anio and DATEPART(quarter,[fecha_inicio]) = cuatrimestre
-join GRAN_EXCEL.[PaquetesXViajes] pxv on pxv.[id_viaje] = v.[id_viaje]
+join GRAN_EXCEL.BI_DIM_RANGO_ETARIO on [legajo] = v.[legajo_chofer_designado]
+--join GRAN_EXCEL.[PaquetesXViajes] pxv on pxv.[id_viaje] = v.[id_viaje]
 join GRAN_EXCEL.[Tipos_paquetes] tp on [id_tipo_paquete] = [id_tipo]
 join GRAN_EXCEL.[Choferes] on [legajo_chofer_designado] = [nro_legajo]
-join GRAN_EXCEL.BI_DIM_RECORRIDO on v.[id_recorrido] = [id_recorrido]
+join GRAN_EXCEL.BI_DIM_RECORRIDO br on v.[id_recorrido] = br.[id_recorrido]
 join GRAN_EXCEL.BI_DIM_CAMION on [id_camion] = v.[id_camion_designado]
-group by [legajo], v.[id_recorrido], v.[id_camion_designado], tiempo_id,v.[id_viaje],[precio],[fecha_fin],[fecha_inicio],[id_recorrido], [id_camion]
+group by [legajo], v.[id_recorrido], v.[id_camion_designado], tiempo_id,v.[id_viaje],br.[precio],[fecha_fin],[fecha_inicio],br.[id_recorrido], [id_camion]
 
 -- DESARROLLO DE CONSTRAINTS
 
