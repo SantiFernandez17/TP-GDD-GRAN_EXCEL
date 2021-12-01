@@ -1,4 +1,4 @@
-USE GD2C2021V2
+USE GD2C2021
 
 go
 
@@ -305,14 +305,14 @@ CREATE TABLE [GRAN_EXCEL].BI_DIM_RANGO_ETARIO(
 )
 
 INSERT INTO GRAN_EXCEL.BI_DIM_RANGO_ETARIO
-SELECT [nro_legajo], GRAN_EXCEL.obtenerEdad([fecha_nacimiento]) from GRAN_EXCEL.[Chofer]
+SELECT [nro_legajo], GRAN_EXCEL.obtenerEdad([fecha_nacimiento]) from GRAN_EXCEL.[Choferes]
 union
-select [nro_legajo], GRAN_EXCEL.obtenerEdad([fecha_nacimiento]) from GRAN_EXCEL.[Mecanico]
+select [nro_legajo], GRAN_EXCEL.obtenerEdad([fecha_nacimiento]) from GRAN_EXCEL.[Mecanicos]
 
 
 
 
-SET IDENTITY_INSERT [GD2C2021V2].[GRAN_EXCEL].[BI_DIM_MATERIALESXTAREA] ON
+SET IDENTITY_INSERT [GD2C2021].[GRAN_EXCEL].[BI_DIM_MATERIALESXTAREA] ON
 INSERT INTO GRAN_EXCEL.BI_DIM_MATERIALESXTAREA ([id_materiales_x_tareas], [id_material], [id_tarea], [cantidad])
 	SELECT [id_materiales_x_tareas], [id_material], [id_tarea], [cantidad]
 	from GRAN_EXCEL.[MaterialesXTareas]
