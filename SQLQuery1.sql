@@ -316,7 +316,7 @@ SET IDENTITY_INSERT [GD2C2021].[GRAN_EXCEL].[BI_DIM_MATERIALESXTAREA] ON
 INSERT INTO GRAN_EXCEL.BI_DIM_MATERIALESXTAREA ([id_materiales_x_tareas], [id_material], [id_tarea], [cantidad])
 	SELECT [id_materiales_x_tareas], [id_material], [id_tarea], [cantidad]
 	from GRAN_EXCEL.[MaterialesXTareas]
-SET IDENTITY_INSERT [GD2C2021V2].[GRAN_EXCEL].[BI_DIM_MATERIALESXTAREA] OFF
+SET IDENTITY_INSERT [GD2C2021].[GRAN_EXCEL].[BI_DIM_MATERIALESXTAREA] OFF
 
 
 
@@ -339,8 +339,12 @@ CREATE TABLE GRAN_EXCEL.[BI_hecho_arreglo](
 )
 
 insert into GRAN_EXCEL.BI_hecho_arreglo
-select distinct [id_taller], md1.[id_modelo], txo.[id_tarea], c.[id_camion], m1.[nro_legajo], md1.[id_marca], tiempo_id, [id_material], [tiempo_real_dias], [tiempo_estimado], [cantidad]
-,(select SUM(mat.[precio]) + SUM(m.[costo_hora])*[tiempo_real_dias]*8 from GRAN_EXCEL.BI_DIM_MATERIALES mat where mat.[id_material] = mat2.[id_material])
+select distinct [id_taller], md1.[id_modelo], txo.[id_tarea], c.[id_camion], m1.[nro_legajo], md1.[id_marca], tiempo_id, [id_material], [tiempo_real_dias], [tiempo_estimado], [cantidad],
+(
+select SUM(mat.[precio]) + SUM(m.[costo_hora])*[tiempo_real_dias]*8
+from GRAN_EXCEL.BI_DIM_MATERIALES mat
+where mat.[id_material] = mat2.[id_material]
+)
 from GRAN_EXCEL.[TareasXOrdenes] txo
 join GRAN_EXCEL.BI_DIM_TIPO_TAREA  on [id_tarea] = txo.[id_tarea]
 join GRAN_EXCEL.[Tareas] t1 on t1.[codigo] = txo.[id_tarea]
