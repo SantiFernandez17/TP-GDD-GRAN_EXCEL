@@ -431,11 +431,12 @@ as
 	from GRAN_EXCEL.BI_hecho_arreglo
 	join GRAN_EXCEL.BI_DIM_TIEMPO on id_de_tiempo = tiempo_id
 	join GRAN_EXCEL.BI_DIM_MATERIAL on id_de_materiales = [id_material]
-	join GRAN_EXCEL.BI_DIM_MECANICO on [nro_legajo] = legajo_mecanicos
+	join GRAN_EXCEL.[Mecanicos] on [nro_legajo] = legajo_mecanicos
 	join GRAN_EXCEL.BI_DIM_MATERIALESXTAREA on [id_tarea] = id_de_tarea
 	group by id_de_camion, [id_del_taller], cuatrimestre
 	
 go
+
 
 
 IF OBJECT_ID ('GRAN_EXCEL.BI_desvio_promedio_tarea_por_taller', 'V') IS NOT NULL  
@@ -443,7 +444,7 @@ IF OBJECT_ID ('GRAN_EXCEL.BI_desvio_promedio_tarea_por_taller', 'V') IS NOT NULL
 GO
 create view GRAN_EXCEL.BI_desvio_promedio_tarea_por_taller
 as
-	select id_de_tarea, [id_del_taller], avg(abs(tiempo_De_Arreglo - tiempoEstimado)) AS 'desvio'
+	select id_de_tarea, [id_del_taller], avg(abs(tiempo_De_Arreglo - tiempoEstimado)) AS 'Desvio'
 	from GRAN_EXCEL.BI_hecho_arreglo	
 	group by id_de_tarea, [id_del_taller]
 
@@ -482,7 +483,7 @@ as
 	group by id_de_materiales
 	order by sum(materiales_cant) desc
 	)
-	group by [id_del_taller],id_de_materiales
+	group by [id_del_taller], id_de_materiales
 	
 
 go
@@ -498,6 +499,7 @@ as
 	group by id_del_recorrido, cuatrimestre 
 
 go
+
 
 IF OBJECT_ID ('GRAN_EXCEL.BI_costo_promedio_por_rango_etario_de_choferes', 'V') IS NOT NULL  
    DROP view GRAN_EXCEL.BI_costo_promedio_por_rango_etario_de_choferes; 
