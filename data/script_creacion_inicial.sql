@@ -688,7 +688,7 @@ INSERT INTO [GRAN_EXCEL].[Paquetes] ([id_tipo])
 GO
 
 
-CREATE PROCEDURE [GRAN_EXCEL].[sp_carga_paquetes_x_viaje]
+/*
 AS
     INSERT INTO [GRAN_EXCEL].[PaquetesXViajes](cantidad, id_tipo_paquete, id_viaje)
 	SELECT SUM(m.[PAQUETE_CANTIDAD]), t.id_tipo, v.id_viaje
@@ -698,8 +698,8 @@ AS
 	join [GRAN_EXCEL].[Tipos_paquetes] t on t.descripcion = m.[PAQUETE_DESCRIPCION]
 	WHERE m.[PAQUETE_CANTIDAD] IS NOT NULL
 	GROUP BY t.id_tipo, v.id_viaje
-
-	/*EL QUE ESTA BIEN ES EL COMENTADO
+	*/
+	
 	CREATE PROCEDURE [GRAN_EXCEL].[sp_carga_paquetes_x_viaje]
 AS
     INSERT INTO [GRAN_EXCEL].[PaquetesXViajes](cantidad, id_tipo_paquete, id_viaje)
@@ -720,8 +720,8 @@ AS
 
 	GROUP BY [id_viaje], [id_paquete], tp.[precio], r.[precio]
 GO
-	*/
-GO
+	
+
 
 
 CREATE PROCEDURE [GRAN_EXCEL].[sp_carga_tipos_tareas]
