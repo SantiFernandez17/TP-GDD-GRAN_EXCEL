@@ -6,11 +6,3 @@ GESTION DE FLOTA
 TRABAJO PRACTICO
 
 GRUPO: 17 - GRAN EXCEL
-
-CURSO: 
-
-INTEGRANTES:
-Tomás Villa - 1715951
-Alejo Contestabile - 1715525
-Santiago Fernandez - 1715495
-Lautaro Lazo -1723212
